@@ -22,6 +22,9 @@ st.write("The Name on your smoothie will be:", name_on_smoothie)
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('search_on')).to_pandas()
 st.dataframe(data=my_dataframe, use_container_width=True)
 
+# Print column names to verify
+st.write(my_dataframe.columns)
+
 # Multiselect for ingredients
 ingredients_list = st.multiselect(
     "Choose up to 5 Ingredients", my_dataframe['FRUIT_NAME'].tolist(), max_selections=5
@@ -32,12 +35,15 @@ if ingredients_list:
 
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
-        search_on = my_dataframe.loc[my_dataframe['FRUIT_NAME'] == fruit_chosen, 'search_on'].iloc[0]
-        st.write(f'The search value for {fruit_chosen} is {search_on}.')
+        if 'search_on' in my_dataframe.columns:
+            search_on = my_dataframe.loc[my_dataframe['FRUIT_NAME'] == fruit_chosen, 'search_on'].iloc[0]
+            st.write(f'The search value for {fruit_chosen} is {search_on}.')
 
-        st.subheader(f'{fruit_chosen} Nutrition Information')
-        fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{search_on}")
-        fv_dv = st.dataframe(fruityvice_response.json(), use_container_width=True)
+            st.subheader(f'{fruit_chosen} Nutrition Information')
+            fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{search_on}")
+            fv_dv = st.dataframe(fruityvice_response.json(), use_container_width=True)
+        else:
+            st.error(f"Column 'search_on' not found in the DataFrame.")
 
 ingredients_string = ', '.join(ingredients_list)
 
