@@ -19,13 +19,8 @@ name_on_smoothie = st.text_input("Name on Smoothie:")
 st.write("The Name on your smoothie will be:", name_on_smoothie)
 
 # Fetching data from Snowflake
-my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'),col('search_on'))
-# st.dataframe(data=my_dataframe, use_container_width=True)
-# st.stop()
-
-pd_df = my_dataframe.to_pandas()
-# st.dataframe(pd_df)
-# st.stop()
+my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('search_on')).to_pandas()
+st.dataframe(data=my_dataframe, use_container_width=True)
 
 # Multiselect for ingredients
 ingredients_list = st.multiselect(
@@ -37,11 +32,11 @@ if ingredients_list:
 
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
-        search_on=pd_df.loc[pd_df['fruit_name']== fruit_chosen, 'search_on'].iloc[0]
-        st.write('The search vluse for ', fruit_chosen,' is ', search_on, '.')
-        
-        st.subheader(fruit_chosen+ 'Nutrition Information')
-        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+        search_on = my_dataframe.loc[my_dataframe['FRUIT_NAME'] == fruit_chosen, 'search_on'].iloc[0]
+        st.write(f'The search value for {fruit_chosen} is {search_on}.')
+
+        st.subheader(f'{fruit_chosen} Nutrition Information')
+        fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{search_on}")
         fv_dv = st.dataframe(fruityvice_response.json(), use_container_width=True)
 
 ingredients_string = ', '.join(ingredients_list)
