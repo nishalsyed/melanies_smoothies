@@ -23,7 +23,7 @@ my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT
 st.dataframe(data=my_dataframe, use_container_width=True)
 
 # Print column names to verify
-st.write(my_dataframe.columns)
+st.write("Columns in DataFrame:", my_dataframe.columns)
 
 # Multiselect for ingredients
 ingredients_list = st.multiselect(
